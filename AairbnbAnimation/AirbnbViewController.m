@@ -294,60 +294,59 @@ static NSUInteger const kRowHeight = 44;
     if (tableView == _backTableView) {
         static NSString *cellStr = @"parentTableViewCell";
         
-        UITableViewCell *cell;
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellStr];
         
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellStr];
             cell.backgroundColor = [UIColor clearColor];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        }
-        
-        if (indexPath.section == 0) {
-            
-            UIView *headerBackView = [[UIView alloc] init];
-            [cell.contentView addSubview:headerBackView];
-            _headerCellContentView = cell.contentView;
-            _headerBackView = headerBackView;
-            headerBackView.backgroundColor = [UIColor whiteColor];
-            headerBackView.frame = CGRectMake(0, 0, kScreenWith, HEADER_VIEW_HEIGHT);
-            
-            for (NSUInteger i = 0; i < 4; i ++) {
-                UIView *view = [[UIView alloc] init];
-                [headerBackView addSubview:view];
-                view.tag = HEADER_VIEW_SUBVIEW_TAG + i;
-                view.frame = CGRectMake(0, i * (HEADER_VIEW_HEIGHT/4.0f), CGRectGetWidth(self.view.frame), HEADER_VIEW_HEIGHT/4.0f);
-                if (i == 0) {
-                    [self configBackHeaderSubView:view leftImage:@"l_up" titleBtn:@"" rightBtn:@"清空条件" isHaveLine:NO];
-                } else if (i == 1) {
-                   _whereTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_periphery" titleBtn:@"想去哪儿？" rightBtn:@"" isHaveLine:YES];
-                } else if (i == 2) {
-                    _whenTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_date" titleBtn:@"何时入住?" rightBtn:@"" isHaveLine:YES];
-                } else if (i == 3) {
-                    _howManyTitleBtn = [self configBackHeaderSubView:view leftImage:@"supervisor" titleBtn:@"几人同行？" rightBtn:@"" isHaveLine:NO];
+            if (indexPath.section == 0) {
+                
+                UIView *headerBackView = [[UIView alloc] init];
+                [cell.contentView addSubview:headerBackView];
+                _headerCellContentView = cell.contentView;
+                _headerBackView = headerBackView;
+                headerBackView.backgroundColor = [UIColor whiteColor];
+                headerBackView.frame = CGRectMake(0, 0, kScreenWith, HEADER_VIEW_HEIGHT);
+                
+                for (NSUInteger i = 0; i < 4; i ++) {
+                    UIView *view = [[UIView alloc] init];
+                    [headerBackView addSubview:view];
+                    view.tag = HEADER_VIEW_SUBVIEW_TAG + i;
+                    view.frame = CGRectMake(0, i * (HEADER_VIEW_HEIGHT/4.0f), CGRectGetWidth(self.view.frame), HEADER_VIEW_HEIGHT/4.0f);
+                    if (i == 0) {
+                        [self configBackHeaderSubView:view leftImage:@"l_up" titleBtn:@"" rightBtn:@"清空条件" isHaveLine:NO];
+                    } else if (i == 1) {
+                        _whereTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_periphery" titleBtn:@"想去哪儿？" rightBtn:@"" isHaveLine:YES];
+                    } else if (i == 2) {
+                        _whenTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_date" titleBtn:@"何时入住?" rightBtn:@"" isHaveLine:YES];
+                    } else if (i == 3) {
+                        _howManyTitleBtn = [self configBackHeaderSubView:view leftImage:@"supervisor" titleBtn:@"几人同行？" rightBtn:@"" isHaveLine:NO];
+                    }
+                    
                 }
                 
+                UIView *lineView = [[UIView alloc] init];
+                [headerBackView addSubview:lineView];
+                lineView.backgroundColor = [UIColor colorWithRed:221/255.0f green:221/255.0f blue:221/255.0f alpha:1];
+                [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.left.right.bottom.equalTo(cell);
+                    make.height.mas_equalTo(1);
+                }];
+                
+            } else {
+                _tableView = [[AirTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+                [cell.contentView addSubview:_tableView];
+                _tableView.frame = CGRectMake(0, 0, CGRectGetWidth(_backTableView.frame), CGRectGetHeight(_backTableView.frame));
+                _tableView.backgroundColor = [UIColor whiteColor];
+                _tableView.positionStatus = 0;
+                _tableView.showsVerticalScrollIndicator = YES;
+                _tableView.delegate = self;
+                _tableView.dataSource = self;
+                
             }
-
-            UIView *lineView = [[UIView alloc] init];
-            [headerBackView addSubview:lineView];
-            lineView.backgroundColor = [UIColor colorWithRed:221/255.0f green:221/255.0f blue:221/255.0f alpha:1];
-            [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.right.bottom.equalTo(cell);
-                make.height.mas_equalTo(1);
-            }];
-            
-        } else {
-            _tableView = [[AirTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
-            [cell.contentView addSubview:_tableView];
-            _tableView.frame = CGRectMake(0, 0, CGRectGetWidth(_backTableView.frame), CGRectGetHeight(_backTableView.frame));
-            _tableView.backgroundColor = [UIColor whiteColor];
-            _tableView.positionStatus = 0;
-            _tableView.showsVerticalScrollIndicator = YES;
-            _tableView.delegate = self;
-            _tableView.dataSource = self;
             
         }
-        
         
         return cell;
 
@@ -526,7 +525,6 @@ static NSUInteger const kRowHeight = 44;
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     if (HEADER_VIEW_HEIGHT - 57 <_backTableView.contentOffset.y && _backTableView.contentOffset.y < HEADER_VIEW_HEIGHT) {
-        self.singleHeaderView.frame = CGRectMake(0, 0, kScreenWith, 57);
         return;
     }
     
@@ -547,7 +545,6 @@ static NSUInteger const kRowHeight = 44;
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     if (HEADER_VIEW_HEIGHT - 57 <_backTableView.contentOffset.y && _backTableView.contentOffset.y < HEADER_VIEW_HEIGHT) {
-        self.singleHeaderView.frame = CGRectMake(0, 0, kScreenWith, 57);
         return;
     }
     if (scrollView == _backTableView) {
@@ -579,11 +576,11 @@ static NSUInteger const kRowHeight = 44;
         CGPoint translation = [panGesture translationInView:_backTableView];
         //显示
         if (_tableView.positionStatus == 1 && _backTableView.positionStatus == 2){
-            if (translation.y >= 30) {
+            if (translation.y >= 20) {
                 [self setHeaderAndBottomHidden:NO animated:YES];
             }
             //隐藏
-            if (translation.y <= -30) {
+            if (translation.y <= -20) {
                 [self setHeaderAndBottomHidden:YES animated:YES];
             }
         }
@@ -619,6 +616,7 @@ static NSUInteger const kRowHeight = 44;
 
 - (void)expandClick:(id)sender
 {
+    [_backTableView setContentOffset:_oldOffset animated:NO];
     if (_coverView) {
         return;
     }
@@ -644,14 +642,9 @@ static NSUInteger const kRowHeight = 44;
     [UIView animateWithDuration:0.3 animations:^{
         _headerBackView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.frame), HEADER_VIEW_HEIGHT);
         _headerBackView.alpha = 1;
-        
-    } completion:^(BOOL finished) {
-        
-        [UIView animateWithDuration:0.2 animations:^{
-            for (UIView *view in _headerBackView.subviews) {
-                view.alpha = 1;
-            }
-        }];
+        for (UIView *view in _headerBackView.subviews) {
+            view.alpha = 1;
+        }
     }];
 
 }
