@@ -300,51 +300,52 @@ static NSUInteger const kRowHeight = 44;
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellStr];
             cell.backgroundColor = [UIColor clearColor];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            if (indexPath.section == 0) {
-                
-                UIView *headerBackView = [[UIView alloc] init];
-                [cell.contentView addSubview:headerBackView];
-                _headerCellContentView = cell.contentView;
-                _headerBackView = headerBackView;
-                headerBackView.backgroundColor = [UIColor whiteColor];
-                headerBackView.frame = CGRectMake(0, 0, kScreenWith, HEADER_VIEW_HEIGHT);
-                
-                for (NSUInteger i = 0; i < 4; i ++) {
-                    UIView *view = [[UIView alloc] init];
-                    [headerBackView addSubview:view];
-                    view.tag = HEADER_VIEW_SUBVIEW_TAG + i;
-                    view.frame = CGRectMake(0, i * (HEADER_VIEW_HEIGHT/4.0f), CGRectGetWidth(self.view.frame), HEADER_VIEW_HEIGHT/4.0f);
-                    if (i == 0) {
-                        [self configBackHeaderSubView:view leftImage:@"l_up" titleBtn:@"" rightBtn:@"清空条件" isHaveLine:NO];
-                    } else if (i == 1) {
-                        _whereTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_periphery" titleBtn:@"想去哪儿？" rightBtn:@"" isHaveLine:YES];
-                    } else if (i == 2) {
-                        _whenTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_date" titleBtn:@"何时入住?" rightBtn:@"" isHaveLine:YES];
-                    } else if (i == 3) {
-                        _howManyTitleBtn = [self configBackHeaderSubView:view leftImage:@"supervisor" titleBtn:@"几人同行？" rightBtn:@"" isHaveLine:NO];
-                    }
-                    
+        }
+        if (indexPath.section == 0) {
+            
+            [_headerBackView removeFromSuperview];
+            UIView *headerBackView = [[UIView alloc] init];
+            [cell.contentView addSubview:headerBackView];
+            _headerCellContentView = cell.contentView;
+            _headerBackView = headerBackView;
+            headerBackView.backgroundColor = [UIColor whiteColor];
+            headerBackView.frame = CGRectMake(0, 0, kScreenWith, HEADER_VIEW_HEIGHT);
+            
+            for (NSUInteger i = 0; i < 4; i ++) {
+                UIView *view = [[UIView alloc] init];
+                [headerBackView addSubview:view];
+                view.tag = HEADER_VIEW_SUBVIEW_TAG + i;
+                view.frame = CGRectMake(0, i * (HEADER_VIEW_HEIGHT/4.0f), CGRectGetWidth(self.view.frame), HEADER_VIEW_HEIGHT/4.0f);
+                if (i == 0) {
+                    [self configBackHeaderSubView:view leftImage:@"l_up" titleBtn:@"" rightBtn:@"清空条件" isHaveLine:NO];
+                } else if (i == 1) {
+                    _whereTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_periphery" titleBtn:@"想去哪儿？" rightBtn:@"" isHaveLine:YES];
+                } else if (i == 2) {
+                    _whenTitleBtn = [self configBackHeaderSubView:view leftImage:@"l_date" titleBtn:@"何时入住?" rightBtn:@"" isHaveLine:YES];
+                } else if (i == 3) {
+                    _howManyTitleBtn = [self configBackHeaderSubView:view leftImage:@"supervisor" titleBtn:@"几人同行？" rightBtn:@"" isHaveLine:NO];
                 }
                 
-                UIView *lineView = [[UIView alloc] init];
-                [headerBackView addSubview:lineView];
-                lineView.backgroundColor = [UIColor colorWithRed:221/255.0f green:221/255.0f blue:221/255.0f alpha:1];
-                [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.left.right.bottom.equalTo(cell);
-                    make.height.mas_equalTo(1);
-                }];
-                
-            } else {
-                _tableView = [[AirTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
-                [cell.contentView addSubview:_tableView];
-                _tableView.frame = CGRectMake(0, 0, CGRectGetWidth(_backTableView.frame), CGRectGetHeight(_backTableView.frame));
-                _tableView.backgroundColor = [UIColor whiteColor];
-                _tableView.positionStatus = 0;
-                _tableView.showsVerticalScrollIndicator = YES;
-                _tableView.delegate = self;
-                _tableView.dataSource = self;
-                
             }
+            
+            UIView *lineView = [[UIView alloc] init];
+            [headerBackView addSubview:lineView];
+            lineView.backgroundColor = [UIColor colorWithRed:221/255.0f green:221/255.0f blue:221/255.0f alpha:1];
+            [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.right.bottom.equalTo(cell);
+                make.height.mas_equalTo(1);
+            }];
+            
+        } else {
+            [_tableView removeFromSuperview];
+            _tableView = [[AirTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+            [cell.contentView addSubview:_tableView];
+            _tableView.frame = CGRectMake(0, 0, CGRectGetWidth(_backTableView.frame), CGRectGetHeight(_backTableView.frame));
+            _tableView.backgroundColor = [UIColor whiteColor];
+            _tableView.positionStatus = 0;
+            _tableView.showsVerticalScrollIndicator = YES;
+            _tableView.delegate = self;
+            _tableView.dataSource = self;
             
         }
         
